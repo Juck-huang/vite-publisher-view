@@ -1,0 +1,34 @@
+.trigger {
+    padding: 0 10px 0 24px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+.trigger:hover {
+    color: #1890ff;
+}
+.logo {
+    height: 32px;
+    margin: 16px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.header-nav {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    .left-nav {
+        position: absolute;
+        display: flex;
+        left: 0;
+        width: 400px;
+        top: 0px;
+        align-items: center;
+    }
+    .right-nav {
+        position: absolute;
+        top: 0;
+        right: 30px;
+        // cursor: pointer;
+    }
+}

@@ -1,0 +1,20 @@
+.site-layout {
+    // .site-layout-background {
+    //     background: #fff;
+    // }
+    .ant-tabs-nav {
+        height: 29px;
+        position: absolute;
+        left: 20px;
+        .ant-tabs-tab-active {
+            .ant-tabs-tab-btn {
+                color: #fff;
+            }
+            background-color: #1890ff;
+            color: #fff;
+            .ant-tabs-tab-remove {
+                color: #fff;
+            }
+        }
+    }
+}
