@@ -5,7 +5,6 @@ import './index.scss'
 // 标签组件
 const TabView = (props: any) => {
     const { panes, activeKey, handleRemoveTab, handleActiveKey } = props
-
     // 切换tab时触发
     const onChange = (key: any) => {
         handleActiveKey(key)

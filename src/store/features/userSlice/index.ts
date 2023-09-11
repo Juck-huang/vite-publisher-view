@@ -28,7 +28,8 @@ const userSlice = createSlice({
         builder.addCase(getUserInfoAsync.pending,state=>{
             // console.log('getUserInfoAsync 执行中还未有结果')
         })
-        .addCase(getUserInfoAsync.fulfilled,(state, { payload })=>{
+        .addCase(getUserInfoAsync.fulfilled,(state, action: any)=>{
+            const { payload } = action
             // console.log('getUserInfoAsync 拿到结果了')
             state.id = payload.result.id
             state.name = payload.result.name

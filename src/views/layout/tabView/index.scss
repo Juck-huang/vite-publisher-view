@@ -1,7 +1,4 @@
 .site-layout {
-    // .site-layout-background {
-    //     background: #fff;
-    // }
     .ant-tabs-nav {
         height: 29px;
         position: absolute;
@@ -10,11 +7,15 @@
             .ant-tabs-tab-btn {
                 color: #fff;
             }
-            background-color: #1890ff;
-            color: #fff;
+            
+            // background-color: #1890ff;
+            // color: #fff;
             .ant-tabs-tab-remove {
                 color: #fff;
             }
         }
+    }
+    .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab-active {
+        background: #1890ff;
     }
 }

@@ -49,7 +49,7 @@ const HeaderView = (props: { collapsedClick?: any; collapsed?: any; currBreadLis
             className="site-layout-background"
             style={{
                 padding: 0,
-                height: '65px',
+                height: '60px',
                 display: 'flex',
                 alignItems: 'center',
             }}

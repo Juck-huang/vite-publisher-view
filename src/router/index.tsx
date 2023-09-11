@@ -5,6 +5,8 @@ import Login from "@/views/login"
 import { setUserInfo } from '@/store/features/userSlice'
 import { shallowEqual, useDispatch, useSelector } from 'react-redux'
 import { GetUserInfo } from '@/api/user'
+import { useEffect } from 'react'
+import { checkTimeout } from '@/utils/timeOut'
 
 const Router = () => {
     const dispatch = useDispatch()
@@ -16,6 +18,10 @@ const Router = () => {
         },
         shallowEqual
     )
+
+    useEffect(()=>{
+        checkTimeout()
+    },[])
     
     return (
         <HashRouter>
@@ -34,8 +40,8 @@ const Router = () => {
                                 return <LayoutView />   
                             } else {
                                 console.log('不存在用户id,准备发送请求获取')
-                                GetUserInfo({}).then((res)=> {
-                                    dispatch(setUserInfo(res.data.result))
+                                GetUserInfo({}).then((res: any)=> {
+                                    dispatch(setUserInfo(res.result))
                                     return <LayoutView />
                                 }).catch(() =>{
                                     return <Redirect to="/login" />

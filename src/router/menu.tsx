@@ -1,25 +1,19 @@
 import { NavLink } from 'react-router-dom'
-
-interface Data {
-    key: string
-    children?: []
-    label?: any
-    id?: number
-    level?: number
-}
+import { HomeOutlined } from '@ant-design/icons'
 
 // 菜单列表
-export const menuList: Array<Data> = [
+export const menuList: Array<any> = [
         {
             key: '/dashboard',
             label: <NavLink to='/dashboard'>主页</NavLink>,
+            icon: <HomeOutlined />,
             id: 1,
             level: 1,
         },
 ]
 
-export const getMenuObj = (dataList: Array<Data>, resultObj: any) => {
-    dataList.forEach((data: Data)=>{
+export const getMenuObj = (dataList: Array<any>, resultObj: any) => {
+    dataList.forEach((data: any)=>{
         resultObj[data.key] = data
         if (data.children) {
             getMenuObj(data.children, resultObj)

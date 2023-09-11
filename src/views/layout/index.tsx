@@ -31,8 +31,6 @@ import { menuList, getMenuObj } from '@/router/menu'
     // 一级默认可点击,二级默认是当前选中菜单的父节点不可点击,三级默认是当前选中节点可点击,选一级就只显示一级为主页,二三级为最后两级
     const [collapsed, setCollapsed] = useState(false)
     const [currBreads, setCurrBreads] = useState([])
-    
-    
     const [panes, setPanes] = useState([
         {
             label: '主页',
@@ -109,6 +107,7 @@ import { menuList, getMenuObj } from '@/router/menu'
         const keyObj: any = {}
         const keyList: any = []
         getMenuObj(menuList, keyObj)
+        
         const d =  keyObj[pathname]
         if (d && d.parentid) {
             getParentData(keyObj, keyList,d.parentid)

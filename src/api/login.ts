@@ -8,3 +8,12 @@ export const login = (data: any) => {
         data
     })
 }
+
+// 登出方法
+export const userLogout = (data: any) => {
+    return request({
+        method: 'post',
+        url: 'rest/user/logout',
+        data
+    })
+}
