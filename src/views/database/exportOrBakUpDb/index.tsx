@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { 
   Modal,
   Space,
@@ -17,7 +17,7 @@ const ExportOrBakUpDb = (props:any) => {
     dbTableOption,
     modalType,
     loading,
-    handleLoading
+    handleLoading,
   } = props
 
   // useEffect(()=>{
