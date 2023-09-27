@@ -1,0 +1,13 @@
+.project-container{
+    // background-color: gray;
+    border: 0.1px solid gray;
+    width: 25%;
+    height: 750px;
+    padding: 5px;
+    overflow-y: scroll;
+    .project-div {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 2px;
+    }
+}

@@ -42,7 +42,7 @@ const Login = (props: { history: { replace: (arg0: string) => void } }) => {
                 aMessage.success('登录成功')
                 // 存储token到localStorage中
                 setToken(result.token)
-                props.history.replace('/dashboard')
+                props.history.replace('/')
             } else {
                 aMessage.error('登录失败:'+ message)
             }
@@ -54,7 +54,7 @@ const Login = (props: { history: { replace: (arg0: string) => void } }) => {
             <div className="login_panel">
                 <div className="login_panel_form">
                     <div className="login_panel_form_title">
-                        <p className="login_panel_form_title_p">后台管理系统</p>
+                        <p className="login_panel_form_title_p">应用发布系统</p>
                     </div>
                     <div className='login-div-form'>
                         <Form

@@ -1,0 +1,18 @@
+.db-container{
+    .db-header {
+        // line-height: 25px;
+        height: 35px;
+        // background-color: #bfa;
+        // margin: 5px;
+        display: flex;
+        justify-content: space-between;
+        .db-item {
+            padding: 0 15px;
+        }
+    }
+    .db-main {
+        margin: 5px;
+        height: 620px;
+        // background-color: aqua;
+    }
+}

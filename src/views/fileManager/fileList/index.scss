@@ -1,0 +1,22 @@
+.container-main {
+    // background-color: silver;
+    border: 0.1px solid gray;
+    width: 75%;
+    margin: auto 0 0 5px;
+    height: 750px;
+    padding: 5px;
+    overflow-y: scroll;
+    .file-div {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 2px;
+    }
+    .file-header-div {
+        display: flex;
+        justify-content: space-between;
+        .button-div {
+            display: flex;
+            justify-content: flex-end;
+        }
+    }
+}

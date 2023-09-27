@@ -1,0 +1,28 @@
+.container {
+    position: relative;
+    height: 100%;
+
+    .header-div {
+        position: absolute;
+        text-align: center;
+        top: 10px;
+        left: 50px;
+        right: 50px;
+    h2 {
+        width: 200px;
+        margin: 0 auto;
+    }
+    span {
+        font-size: 2px;
+        color: brown;
+    }
+    }
+
+    .main-div {
+        position: absolute;
+        top: 90px;
+        left: 50px;
+        bottom: 50px;
+        right: 50px;
+    }
+}
