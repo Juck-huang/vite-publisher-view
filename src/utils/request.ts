@@ -32,9 +32,23 @@ service.interceptors.response.use(function (response) {
     // 对响应数据做点什么
     NProgress.done()
     return response.data;
-  }, function (error: { message: string; }) {
+  }, function (error: any) {
+    // 如果是4xx系列的请求，则是授权失败弹出对应提示
+    switch (error.response.status) {
+    case 401:
+      message.error('请求服务器失败:'+error.response.data.message)
+      break
+    case 502:
+      message.error('请求服务器失败:'+error.message)
+      break
+    case 500:
+      message.error('请求服务器失败:'+error.message)
+      NProgress.done()
+      return Promise.reject(error)
+    default:
+      message.error('请求服务器失败')
+    }
     // 则先判断本地是否有token，有则从本地删除token，并且跳转到登录页面
-    message.error('请求服务器失败:'+error.message)
     NProgress.done()
     if (getToken()) {
       // 移除本地的token

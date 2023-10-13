@@ -1,5 +1,10 @@
 import { NavLink } from 'react-router-dom'
-import { HomeOutlined } from '@ant-design/icons'
+import { 
+    HomeOutlined, 
+    AppstoreAddOutlined,
+    DatabaseOutlined,
+    ProfileOutlined
+ } from '@ant-design/icons'
 
 // 菜单列表
 export const menuList: Array<any> = [
@@ -13,6 +18,7 @@ export const menuList: Array<any> = [
         {
             key: '/application',
             label: '发布管理',
+            icon: <AppstoreAddOutlined />,
             id: 2,
             level: 1,
             children: [
@@ -36,12 +42,14 @@ export const menuList: Array<any> = [
             key: '/database',
             label: <NavLink to='/database'>数据库管理</NavLink>,
             id: 6,
+            icon: <DatabaseOutlined />,
             level: 1,
         },
         {
             key: '/fileManager',
             label: <NavLink to='/fileManager'>文件管理</NavLink>,
             id: 7,
+            icon: <ProfileOutlined />,
             level: 1,
         },
 ]

@@ -1,6 +1,6 @@
-import { useContext, useRef, useState, useCallback, forwardRef, useImperativeHandle, useEffect } from 'react'
+import React, { useContext, useRef, useState, useCallback, forwardRef, useImperativeHandle, useEffect } from 'react'
 import { Space, Table, Tag, Breadcrumb,Button, Popconfirm,
-      Dropdown, message as msg, message } from 'antd'
+      Dropdown, message as msg, message, Modal } from 'antd'
 import { 
     HomeOutlined,
     FolderAddOutlined,
@@ -8,16 +8,18 @@ import {
     FolderOutlined,
     FileOutlined,
     DownOutlined,
+    DeleteOutlined,
 } from '@ant-design/icons'
 import './index.scss'
 import FileUploadModal from './fileUploadModal'
 import FileEditModal from './fileEditModal'
-import { DownloadProjectFile, RemoveProjectFile, GetProjectFileList } from '@/api/fileManage'
+import { RemoveProjectFile, GetProjectFileList } from '@/api/fileManage'
 import { FileContext } from '../fileContext'
 import AddFolder from './addFolder'
 import AddFile from './addFile'
 import RenameFileOrFolder from './renameFileOrFolder'
 import { ColumnsType } from 'antd/es/table'
+import { getToken } from '@/utils/auth'
 
 const FileList = forwardRef((props:any, ref) => {
     
@@ -32,6 +34,8 @@ const FileList = forwardRef((props:any, ref) => {
     const [uploadPath, setUploadPath] = useState('') // 上传文件路径
     const [currClickFileName, setCurrClickFileName] = useState('') // 当前点击的文件名
     const breadRef:any = useRef() // 监听面包屑容器
+    const [tableSelectedRowKeys, setTableSelectedRowKeys] = useState<React.Key[]>([]) // 表格已选择的keys
+    const [openDelteModal, setOpenDelteModal] = useState(false) // 打开删除确认框
     // 面包屑数据
     const [breadcrumbList, setBreadcrumbList] = useState<any[]>([])
     // 右侧表格数据 
@@ -117,8 +121,10 @@ const FileList = forwardRef((props:any, ref) => {
                     label: <div style={{cursor: 'pointer', color: 'black', fontSize: 12}} onClick={()=>{handleRenameFile(record)}}>重命名</div>
                   }
               ]
-              if (record.type === 'file' && (record.extName === 'txt' || record.extName === 'yml')) {
-                // 如果是txt,yaml文件则支持编辑功能
+              // 可编辑的文件扩展名列表
+              const editExtNames = ['txt', 'yaml', 'yml', 'sh', 'json', 'log']
+              if (record.type === 'file' && editExtNames.includes(record.extName)){
+                // 支持编辑功能
                 items.push({
                     key: 'edit',
                     label: (<div style={{cursor: 'pointer', color: 'black', fontSize: 12}} onClick={()=>{handleFileEdit(true, record)}}>编辑</div>)
@@ -225,38 +231,70 @@ const FileList = forwardRef((props:any, ref) => {
       handleLoading(true)
       // console.log('key', key, breadRef.current.at(-1))
       const pathName = breadRef.current.length ? `${breadRef.current.at(-1).key}/${key}` : key
-      const params = {
-          projectId: projectIdRef.current,
-          projectEnvId: projectEnvIdRef.current,
-          projectTypeId: projectTypeIdRef.current,
-          pathName
+      const projectId = projectIdRef.current
+      const projectEnvId = projectEnvIdRef.current
+      const projectTypeId = projectTypeIdRef.current
+    //   const params = {
+    //       projectId: projectIdRef.current,
+    //       projectEnvId: projectEnvIdRef.current,
+    //       projectTypeId: projectTypeIdRef.current,
+    //       pathName
+    //   }
+      // 使用iframe下载，支持暂停
+      const url = `/api/rest/fileManager/getProjectFile?token=${getToken()}&projectId=${projectId}&projectEnvId=${projectEnvId}&projectTypeId=${projectTypeId}&pathName=${pathName}`
+      let iframe:any = document.createElement('iframe')
+      iframe.src = url
+      iframe.id= 'myIframe'
+      iframe.style.display = 'none'
+      iframe.onload = () => {
+          document.body.removeAttribute(iframe)
       }
-      const res:any = await DownloadProjectFile(params)
-      if (res.type === 'application/json') {
-          // 说明下载失败
-          const file:any = new FileReader()
-          file.readAsText(res, 'utf-8')
-          file.onload = () => {
-              const { success, message } = JSON.parse(file.result)
-              if (!success) {
-                  msg.error(message)
-                  return
-              }
-          }
-      } else if (res.type === 'application/octet-stream') {
-          const blob = new Blob([res])
-          const blobUrl = URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.style.display = 'none'
-          document.body.appendChild(a)
-          a.download = key
-          a.href = blobUrl
-          a.click()
-          document.body.removeChild(a)
-      } else {
-          msg.error('所选文件或文件夹暂不支持下载')
-          return
-      }
+      document.body.appendChild(iframe)
+      setTimeout(() => {
+        const myIframe:any = document.getElementById('myIframe')
+        const myIframeBody = myIframe.contentDocument.body
+        const preDatas = myIframeBody.getElementsByTagName('pre')
+        
+        if (preDatas.length) {
+            // 说明返回的是错误信息
+            const innerHTML = preDatas[0]?.innerHTML
+            if (innerHTML) {
+                const res = JSON.parse(innerHTML)
+                if (!res.success) return msg.error('下载文件失败:'+res.msg)
+            }
+        }
+        
+        // n毫秒后销毁iframe
+        iframe.src = "about:blank"
+        iframe.parentNode.removeChild(iframe)
+      }, 200)
+
+    //   const res:any = await DownloadProjectFile(params)
+    //   if (res.type === 'application/json') {
+    //       // 说明下载失败
+    //       const file:any = new FileReader()
+    //       file.readAsText(res, 'utf-8')
+    //       file.onload = () => {
+    //           const { success, message } = JSON.parse(file.result)
+    //           if (!success) {
+    //               msg.error(message)
+    //               return
+    //           }
+    //       }
+    //   } else if (res.type === 'application/octet-stream') {
+    //       const blob = new Blob([res])
+    //       const blobUrl = URL.createObjectURL(blob)
+    //       const a = document.createElement('a')
+    //       a.style.display = 'none'
+    //       document.body.appendChild(a)
+    //       a.download = key
+    //       a.href = blobUrl
+    //       a.click()
+    //       document.body.removeChild(a)
+    //   } else {
+    //       msg.error('所选文件或文件夹暂不支持下载')
+    //       return
+    //   }
       handleLoading(false)
     }
   
@@ -306,6 +344,23 @@ const FileList = forwardRef((props:any, ref) => {
         setCurrClickFileName(value.name)
     }
 
+    // 表格勾选后的回调
+    const tableOnSelectChange = (newSelectedRowKeys: React.Key[]) => {
+        // console.log('selectedRowKeys changed: ', newSelectedRowKeys)
+        setTableSelectedRowKeys(newSelectedRowKeys)
+    }
+
+    const rowSelection = {
+        selectedRowKeys: tableSelectedRowKeys,
+        onChange: tableOnSelectChange,
+    }
+
+    // 提交勾选删除
+    const submitDeleteChecked = () =>{
+        console.log('tableSelectedRowKeys', tableSelectedRowKeys)
+        setOpenDelteModal(false)
+    }
+
     // 暴露组件方法给父组件调用
     useImperativeHandle(ref,
         () => ({getFileList,clearBread}),
@@ -314,6 +369,8 @@ const FileList = forwardRef((props:any, ref) => {
   
     useEffect(()=>{
         breadRef.current = breadcrumbList
+        console.log('tableSelectedRowKeys', tableSelectedRowKeys)
+        setTableSelectedRowKeys([]) // 清空已经选择的keys
     },[breadcrumbList])
 
     return (
@@ -340,6 +397,10 @@ const FileList = forwardRef((props:any, ref) => {
                     {
                         showButton ? (
                             <>
+                                {/* 删除勾选按钮动态展示，当前有一个及以上勾选时展示 */}
+                                {
+                                    tableSelectedRowKeys.length ? <Button type="primary" size='small' icon={<DeleteOutlined />} onClick={()=>setOpenDelteModal(true)}  style={{marginRight: 5}}>删除勾选</Button>: <></>
+                                }
                                 <Button type="primary" size='small' 
                                     icon={<FolderAddOutlined />} 
                                     style={{marginRight: 5}}
@@ -359,6 +420,7 @@ const FileList = forwardRef((props:any, ref) => {
             
             <Table 
                 locale={{emptyText: '暂无数据'}}
+                rowSelection={rowSelection}
                 columns={tableColumns}
                 dataSource={tableData}
                 pagination={false}
@@ -421,6 +483,19 @@ const FileList = forwardRef((props:any, ref) => {
                 currClickFileName={currClickFileName}
                />
            ) : <></>
+        }
+        {
+            <Modal
+            title="提示"
+            open={openDelteModal}
+            onCancel={()=>setOpenDelteModal(false)}
+            maskClosable={false}
+            onOk={submitDeleteChecked}
+            okText="确认"
+            cancelText="取消"
+          >
+            <h4>确认删除选中文件/文件夹? <span style={{color: 'red'}}>(注意，删除操作不可逆!!!)</span></h4>
+          </Modal>
         }
       </>
     )

@@ -8,6 +8,7 @@ import { setToken } from '@/utils/auth'
 import {login} from '@/api/login'
 import JSEncrypt from 'jsencrypt'
 import './index.scss'
+import { useState } from 'react'
 const { Item } = Form
 
 // rsa加密公钥
@@ -22,6 +23,8 @@ const publicKey = `
 
 const Login = (props: { history: { replace: (arg0: string) => void } }) => {
 
+    const [loading, setLoading] = useState(false)
+
     // 密码rsa加密
     const handlePasswordEncrpy = (password: string) => {
         const encryptor = new JSEncrypt()
@@ -31,6 +34,7 @@ const Login = (props: { history: { replace: (arg0: string) => void } }) => {
 
     // 登录请求
     const onFinish = (values: { password: any; username: any }) => {
+        setLoading(true)
         const passwordEncrpy = handlePasswordEncrpy(values.password)
         const loginFrom = {
             username: values.username,
@@ -39,6 +43,7 @@ const Login = (props: { history: { replace: (arg0: string) => void } }) => {
         login(loginFrom).then((res: any) => {
             const { success, message, result } = res
             if (success) {
+                
                 aMessage.success('登录成功')
                 // 存储token到localStorage中
                 setToken(result.token)
@@ -46,6 +51,7 @@ const Login = (props: { history: { replace: (arg0: string) => void } }) => {
             } else {
                 aMessage.error('登录失败:'+ message)
             }
+            setLoading(false)
         })
     }
 
@@ -90,7 +96,7 @@ const Login = (props: { history: { replace: (arg0: string) => void } }) => {
                                 />
                             </Item>
                             <Item>
-                                <Button type="primary" htmlType="submit" className="login-form-button">
+                                <Button disabled={loading} type="primary" htmlType="submit" className="login-form-button">
                                     登录
                                 </Button>
                             </Item>

@@ -49,6 +49,27 @@ export function UploadProjectFile(data:any){
     })
 }
 
+// 上传项目切片文件
+export function UploadProjectFileChunk(data:any){
+    return request({
+        method: 'post',
+        url: '/rest/fileManager/uploadProjectFileChunk',
+        data,
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded'
+        }
+    })
+}
+
+// 合并项目切片文件为一个
+export function MergeFileChunk(data:any){
+    return request({
+        method: 'post',
+        url: '/rest/fileManager/mergeFileChunk',
+        data,
+    })
+}
+
 // 下载项目文件
 export function DownloadProjectFile(data:any, responseType:any='blob'){
     return request({

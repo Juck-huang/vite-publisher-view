@@ -6,15 +6,15 @@ import { getProjectList } from '@/api/fileManage'
 const { Search } = Input
 
 // 项目列表
-const ProjectList = ({handleCurrProjectInfo}) => {
-
+const ProjectList = (props:any) => {
+    const {handleCurrProjectInfo} = props
     const [treeData, setTreeData] = useState([]) // 树的数据
     const [expandedKeys, setExpandedKeys] = useState([]) // 树展开的key列表
     // const [selectKeys, setSelectKeys] = useState([]) // 选择的key列表
 
     // 处理选择了树后的回调
-    const handSelectTree = (selectedKeys, e) => {
-      console.log('selectedKeys', selectedKeys)
+    const handSelectTree = (selectedKeys:any[]) => {
+      // console.log('selectedKeys', selectedKeys)
       const idList = selectedKeys.length ? selectedKeys.at(-1).split('-'): []
       if (!idList.length) return
       const params = {
@@ -26,13 +26,13 @@ const ProjectList = ({handleCurrProjectInfo}) => {
     }
 
     // 递归获取列表
-    const getTreeList = useCallback((srcList, currNode, projectEnvKey) => {
+    const getTreeList = useCallback((srcList:any[], currNode:any, projectEnvKey:any) => {
       const node = srcList.filter(item=>{
           return item.parentId === currNode.id
       })
       if (!currNode.isLeaf) {
           currNode.children = node
-          currNode.children.forEach(item=>{
+          currNode.children.forEach((item:any)=>{
               item.title = item.name
               item.key = `${projectEnvKey}-${item.id}`
               delete item.treeId
@@ -46,7 +46,7 @@ const ProjectList = ({handleCurrProjectInfo}) => {
     },[])
 
     // 构造树数据
-    const buildTreeList = useCallback((dataList, projectEnvKey) => {
+    const buildTreeList = useCallback((dataList:any[], projectEnvKey:any) => {
       // 过滤出来没有父id的数据
       let rootList = dataList.filter(src=>{
           return !src.parentId
@@ -64,23 +64,23 @@ const ProjectList = ({handleCurrProjectInfo}) => {
 
     // 获取项目树数据
     const getTreeData = useCallback(async () => {
-      const { result } = await getProjectList()
+      const { result }:any = await getProjectList({})
       const { projectList, projectEnvList, projectTypeList } = result
-      let dataList = []
+      let dataList:any = []
       // 项目列表
-      projectList.forEach(project => {
+      projectList.forEach((project:any) => {
           project.title = project.name
           project.key = `${project.id}`
           project.selectable = false
           // 对应项目环境列表
-          const projectEnvs = projectEnvList.filter(projectEnv => projectEnv.projectId === project.id)
+          const projectEnvs = projectEnvList.filter((projectEnv:any) => projectEnv.projectId === project.id)
           if(projectEnvs.length) {
-              projectEnvs.forEach(projectEnv => {
+              projectEnvs.forEach((projectEnv:any) => {
                   projectEnv.title = projectEnv.name
                   projectEnv.key = `${project.id}-${projectEnv.id}`
                   projectEnv.selectable = false
                   // 项目类型列表
-                  const projectTypes = projectTypeList.filter(projectType => projectType.projectId === project.id)
+                  const projectTypes = projectTypeList.filter((projectType:any) => projectType.projectId === project.id)
                   if (projectTypes.length) {
                       const projectTypesTemp = JSON.parse(JSON.stringify(projectTypes))
                       projectEnv.children = buildTreeList(projectTypesTemp, projectEnv.key)
@@ -94,12 +94,12 @@ const ProjectList = ({handleCurrProjectInfo}) => {
     },[buildTreeList])
 
     // 树展开时的操作
-    const onExpand = (newExpandedKeys) => {
+    const onExpand = (newExpandedKeys:any) => {
       setExpandedKeys(newExpandedKeys)
     }
 
     // 设置当前项目信息
-    const setCurrProjectInfo = (params) => {
+    const setCurrProjectInfo = (params:any) => {
       // 每次切换了不同的项目环境后，面包屑需要先清除
       // setBreadcrumbList([])
       // setProjectId(params.projectId)
