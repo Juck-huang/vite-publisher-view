@@ -3,7 +3,9 @@ import {
     HomeOutlined, 
     AppstoreAddOutlined,
     DatabaseOutlined,
-    ProfileOutlined
+    ProfileOutlined,
+    CloudServerOutlined,
+    ProjectOutlined,
  } from '@ant-design/icons'
 
 // 菜单列表
@@ -17,7 +19,7 @@ export const menuList: Array<any> = [
         },
         {
             key: '/application',
-            label: '发布管理',
+            label: '应用管理',
             icon: <AppstoreAddOutlined />,
             id: 2,
             level: 1,
@@ -52,8 +54,62 @@ export const menuList: Array<any> = [
             icon: <ProfileOutlined />,
             level: 1,
         },
+        {
+            key: '/serverManage',
+            label: '服务器管理',
+            id: 8,
+            icon: <CloudServerOutlined />,
+            level: 1,
+            children: [
+                {
+                    key: '/serverManage/serverList',
+                    label: <NavLink to='/serverManage/serverList'>服务器列表</NavLink>,
+                    id: 9,
+                    parentid:8,
+                    level: 2,
+                },
+                {
+                    key: '/serverManage/serverMonitor',
+                    label: <NavLink to='/serverManage/serverMonitor'>服务器监控</NavLink>,
+                    id: 10,
+                    parentid: 8,
+                    level: 2
+                }
+            ]
+        },
+        {
+            key: '/projectManage',
+            label: '项目管理',
+            id: 11,
+            icon: <ProjectOutlined />,
+            level: 1,
+            children: [
+                {
+                    key: '/projectManage/projectList',
+                    label: <NavLink to='/projectManage/projectList'>项目列表</NavLink>,
+                    id: 12,
+                    parentid: 11,
+                    level: 2,
+                },
+                {
+                    key: '/projectManage/projectEnv',
+                    label: <NavLink to='/projectManage/projectEnv'>项目环境</NavLink>,
+                    id: 13,
+                    parentid: 11,
+                    level: 2
+                },
+                {
+                    key: '/projectManage/projectType',
+                    label: <NavLink to='/projectManage/projectType'>项目类型</NavLink>,
+                    id: 14,
+                    parentid: 11,
+                    level: 2
+                }
+            ]
+        },
 ]
 
+// 获取菜单对象
 export const getMenuObj = (dataList: Array<any>, resultObj: any) => {
     dataList.forEach((data: any)=>{
         resultObj[data.key] = data

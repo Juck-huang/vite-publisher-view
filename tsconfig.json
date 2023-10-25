@@ -6,7 +6,6 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "esModuleInterop": true, // 解决引入第三方js库保存
-
     /* Bundler mode */
     "moduleResolution": "node",
     // "allowImportingTsExtensions": true,

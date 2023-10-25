@@ -7,7 +7,7 @@ import { setOperationTime } from './timeOut'
 
 const service = axios.create({
     baseURL: process.env.NODE_ENV === 'production'?'/aps-web':'/api',
-    timeout: 120000, // 单位毫秒
+    timeout: 1000 * 60 * 5 , // 单位毫秒
 })
 
 NProgress.configure({ showSpinner: false }); // 显示右上角螺旋加载提示
@@ -34,7 +34,7 @@ service.interceptors.response.use(function (response) {
     return response.data;
   }, function (error: any) {
     // 如果是4xx系列的请求，则是授权失败弹出对应提示
-    switch (error.response.status) {
+    switch (error?.response?.status) {
     case 401:
       message.error('请求服务器失败:'+error.response.data.message)
       break

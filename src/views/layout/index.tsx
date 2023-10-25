@@ -19,6 +19,7 @@ import { menuList, getMenuObj } from '@/router/menu'
             if (location.pathname === '/') {
                 props.history.replace('/dashboard')
                 handleOpenKeys('/dashboard')
+                return
             }
             // 处理左侧菜单点击
             menuClick(location.pathname)
@@ -51,7 +52,7 @@ import { menuList, getMenuObj } from '@/router/menu'
         let resultList: any = []
         getMenuObj(menuList, keyObj)
         // 不是根路径再去匹配
-        if (key !== '/') {
+        if (key !== '/' && keyObj[key]) {
             const {level} = keyObj[key]
             if (level === 1) {
                 const {children, to } = keyObj[key].label.props
@@ -68,6 +69,9 @@ import { menuList, getMenuObj } from '@/router/menu'
             }else {
                 console.log('未匹配到任何面包屑')
             }
+        } else if (key !== '/' && !keyObj[key]) {
+            props.history.replace('/dashboard')
+            handleOpenKeys('/dashboard')
         }
         // 设置当前面包屑的值
         setCurrBreads(resultList)

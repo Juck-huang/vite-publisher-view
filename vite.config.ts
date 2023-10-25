@@ -12,7 +12,7 @@ export default defineConfig({
     open: '/', // 自动打开浏览器
     proxy: {
       '/api': {
-        target: 'http://139.9.41.8/aps-web/',
+        target: 'http://172.168.20.160:8002/aps-web/',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
