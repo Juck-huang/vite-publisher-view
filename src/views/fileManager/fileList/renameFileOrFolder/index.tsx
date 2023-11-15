@@ -19,10 +19,10 @@ const RenameFileOrFolder = (props:any) => {
     projectEnvIdRef, 
     projectTypeIdRef,
     handleLoading
-  } = useContext(FileContext)
+  }:any = useContext(FileContext)
 
   const handleOk =  () => {
-    form.validateFields().then(async (res:any) => {
+    form.validateFields().then(async () => {
         handleLoading(true)
         const params:any = {
             projectId: projectIdRef.current,

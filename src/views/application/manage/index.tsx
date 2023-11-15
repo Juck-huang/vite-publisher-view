@@ -20,7 +20,7 @@ const Manage = () => {
     {
       title: '操作',
       key: 'action',
-      render: (_: any, record: object) => (
+      render: (_: any) => (
         <Space size="middle">
           <span style={{cursor: 'pointer', color: 'blue'}} onClick={()=>{handleManageProject()}}>应用管理</span>
         </Space>
@@ -58,7 +58,7 @@ const Manage = () => {
   }// 运行或停止项目处理
 
   const handleDaemonChecked = (checked: boolean, record:any) => {
-
+    console.log(checked, record)
   } // 守护进程点击处理
 
   const [tableColumns, 
@@ -91,7 +91,7 @@ const Manage = () => {
       title: '实时日志',
       dataIndex: 'realTimeLog',
       key: 'realTimeLog',
-      render: (_:any, record:any) => <Button type="primary" size='small'>预览</Button>
+      render: (_:any) => <Button type="primary" size='small'>预览</Button>
     },
   ]) // 管理对话框表格列
   const [tableData, setTableData] = useState([

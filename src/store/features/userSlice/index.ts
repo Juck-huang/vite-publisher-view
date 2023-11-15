@@ -25,7 +25,7 @@ const userSlice = createSlice({
     },
     // 额外的 reducer 执行异步操作
     extraReducers: (builder) => {
-        builder.addCase(getUserInfoAsync.pending,state=>{
+        builder.addCase(getUserInfoAsync.pending,()=>{
             // console.log('getUserInfoAsync 执行中还未有结果')
         })
         .addCase(getUserInfoAsync.fulfilled,(state, action: any)=>{
@@ -36,7 +36,7 @@ const userSlice = createSlice({
             state.avatar = payload.result.avatar
             state.userPrivileges = payload.result.userPrivileges
         })
-        .addCase(getUserInfoAsync.rejected,(state, action)=>{
+        .addCase(getUserInfoAsync.rejected,()=>{
             console.log('getUserInfoAsync错误')
         })
     }

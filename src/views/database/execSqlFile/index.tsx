@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { UploadOutlined } from '@ant-design/icons'
 import { 
     Modal,

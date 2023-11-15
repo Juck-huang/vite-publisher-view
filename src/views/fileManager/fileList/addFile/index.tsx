@@ -12,7 +12,7 @@ const AddFile = (props:any) => {
     projectEnvIdRef, 
     projectTypeIdRef,
     handleLoading
-  } = useContext(FileContext)
+  }:any = useContext(FileContext)
 
   const handleOk =  () => {
     form.validateFields().then(async res => {

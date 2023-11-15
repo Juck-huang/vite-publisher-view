@@ -13,6 +13,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://172.168.20.160:8002/aps-web/',
+        // target: 'https://www.hkqsgl.com/aps-web/',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }

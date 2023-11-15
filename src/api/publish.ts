@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 // 上传文件
-export function releaseProject(data){
+export function releaseProject(data:any){
     return request({
         method: 'post',
         url: '/rest/publish/release',

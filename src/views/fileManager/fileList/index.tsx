@@ -48,7 +48,7 @@ const FileList = forwardRef((props:any, ref) => {
       projectTypeIdRef,
       // currEditFile,
       handleLoading
-    } = useContext(FileContext)
+    }:any = useContext(FileContext)
     // 右侧表格列
     const [tableColumns, 
       // setTableColumns

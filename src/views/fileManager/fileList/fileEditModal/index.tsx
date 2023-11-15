@@ -1,5 +1,5 @@
 import { Modal, Space, message } from 'antd'
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import MyCodeMiddor from '@/components/myCodeMirror'
 import { FileContext } from '../../fileContext'
 import { getFileContent } from '@/api/fileManage'
@@ -16,7 +16,7 @@ const FileEditModal = (props:any) => {
     projectTypeIdRef,
     currEditFile,
     handleLoading
-  } = useContext(FileContext)
+  }:any = useContext(FileContext)
 
   const handleOk = async () => {
     handleLoading(true)

@@ -2,7 +2,7 @@ import { Modal, Space } from 'antd'
 import { UploadOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { message, Upload, notification } from 'antd'
 import { useContext, useState } from 'react'
-import { MergeFileChunk, UploadProjectFile, UploadProjectFileChunk } from '@/api/fileManage'
+import { MergeFileChunk, UploadProjectFileChunk } from '@/api/fileManage'
 import { FileContext } from '../../fileContext'
 
 const { Dragger } = Upload
@@ -21,7 +21,7 @@ const FileUploadModal = (props:any) => {
         worker.postMessage({fileChunks})
         worker.onmessage = (e) => {
             // 进度条
-            const { percentage, hash } = e.data
+            const { hash } = e.data
             // console.log('percentage:', percentage)
             hash && resolve(hash)
         }
@@ -42,44 +42,44 @@ const FileUploadModal = (props:any) => {
   }
 
    // 合并单个文件
-   const mergeFile = async (fileName:string, fileHash:string) => {
-      const params = {
-        fileName,
-        fileHash,
-        pathName: uploadPath,
-        projectId: fileContext.projectIdRef.current,
-        projectEnvId: fileContext.projectEnvIdRef.current,
-        projectTypeId: fileContext.projectTypeIdRef.current
-      }
-      const res:any = await MergeFileChunk(params)
-      const { success } = res
-      if (!success) {
-          notification.open({
-            message: '上传文件失败',
-            description: `上传文件${fileName}失败`,
-            duration: 30,
-            icon: (
-              <CloseCircleOutlined
-                style={{
-                  color: 'red',
-                }}
-              />
-            ),
-          })
-          return
-      }
-      notification.open({
-        message: '上传文件成功',
-        description: `上传文件${fileName}成功`,
-        icon: (
-          <CheckCircleOutlined
-            style={{
-              color: 'green',
-            }}
-          />
-        ),
-      })
-  }
+  //  const mergeFile = async (fileName:string, fileHash:string) => {
+  //     const params = {
+  //       fileName,
+  //       fileHash,
+  //       pathName: uploadPath,
+  //       projectId: fileContext.projectIdRef.current,
+  //       projectEnvId: fileContext.projectEnvIdRef.current,
+  //       projectTypeId: fileContext.projectTypeIdRef.current
+  //     }
+  //     const res:any = await MergeFileChunk(params)
+  //     const { success } = res
+  //     if (!success) {
+  //         notification.open({
+  //           message: '上传文件失败',
+  //           description: `上传文件${fileName}失败`,
+  //           duration: 30,
+  //           icon: (
+  //             <CloseCircleOutlined
+  //               style={{
+  //                 color: 'red',
+  //               }}
+  //             />
+  //           ),
+  //         })
+  //         return
+  //     }
+  //     notification.open({
+  //       message: '上传文件成功',
+  //       description: `上传文件${fileName}成功`,
+  //       icon: (
+  //         <CheckCircleOutlined
+  //           style={{
+  //             color: 'green',
+  //           }}
+  //         />
+  //       ),
+  //     })
+  // }
 
   // 上传单个文件
   const uploadFile = (chunkList:any, fileName:string, fileHash:string) => {
@@ -273,14 +273,14 @@ const FileUploadModal = (props:any) => {
   }
 
   // 文件发送变化时触发
-  const handleFileChange = (info:any) => {
+  // const handleFileChange = (info:any) => {
     // console.log('change', fileList)
     // 如果是上传文件则计算文件的md5,移除则不需要
     // if(!fileList.includes(info.file)) {
       // setFileList(files => [...files, info.file])
     // }
     // console.log('info', info.file, fileList)
-  }
+  // }
 
   // 改为手动上传
   const handleBeforeUpload = async (file:any) => {

@@ -1,4 +1,4 @@
-import { Card, Table, Space, Switch, Button, message, Modal } from 'antd'
+import { Card, Table, Space, Switch, Button, Modal, Select } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useEffect, useState } from 'react';
 import AddOrEditModal from './addOrEditModal';
@@ -17,6 +17,7 @@ interface DataType {
   const [showAddOrEdit,setShowAddOrEdit] = useState(false)
   const [isAdd, setIsAdd] = useState(false)
   const [modalData, setModalData] = useState<DataType>() // 编辑时的数据传输
+  const [selectStatus, setSelectStatus] = useState()
   
   const columns: ColumnsType<DataType> = [
     {
@@ -29,7 +30,14 @@ interface DataType {
       title: '项目状态',
       dataIndex: 'state',
       key: 'state',
-      render: (_, record:any) => <Switch checkedChildren="运行" unCheckedChildren="关闭" defaultChecked={record.state == 1} onChange={(value)=>handleSwitchChange(value, record.key)} />,
+      render: (_, record:any) => (
+          <Switch 
+            checkedChildren={statusOptions.find(statusObj => statusObj.value=== 1)?.label} 
+            unCheckedChildren={statusOptions.find(statusObj => statusObj.value=== 0)?.label} 
+            defaultChecked={record.state == 1} 
+            onChange={(value)=>handleSwitchChange(value, record.key)} 
+          />
+        ),
     },
     {
       title: '创建时间',
@@ -59,18 +67,24 @@ interface DataType {
     },
   ]
 
+  // 项目状态可选框
+  const statusOptions = [{ label: '运行', value: 1 },{label: '关闭', value: 0 }]
+
+  // 切换项目状态
   const handleSwitchChange = (value:any, key:any) => {
     const findI = tableData.findIndex(table => table.key === key)
     tableData[findI].state = value?1:0
     setTableData([...tableData])
   }
 
+  // 编辑
   const handleEdit = (record:DataType) => {
     setModalData(record)
     setShowAddOrEdit(true)
     setIsAdd(false)
   }
 
+  // 删除
   const handleDelete = (record:DataType) =>{
     Modal.confirm({
       title: '提示',
@@ -91,6 +105,14 @@ interface DataType {
     setModalData(nullData)
     setShowAddOrEdit(true)
     setIsAdd(true)
+  }
+
+  const handleSearch = () => {
+
+  }
+
+  const handleResetSearch = () => {
+    
   }
 
   useEffect(()=>{
@@ -121,11 +143,21 @@ interface DataType {
 
   return (
     <>
-      <Card title="项目列表" size='small' extra={
-        <>
+      <Card title="项目列表" size='small'>
+        <Space>
+        项目状态: 
+          <Select
+            allowClear
+            style={{ width: 120 }}
+            placeholder="请选择状态"
+            value={selectStatus}
+            options={statusOptions}
+            onChange={(value:any)=>{setSelectStatus(value)}}
+          />
+          <Button type="primary" onClick={handleSearch}>查询</Button>
+          <Button type="primary" onClick={handleResetSearch}>重置</Button>
           <Button type="primary" onClick={handleAdd}>新建项目</Button>
-        </>
-      }>
+        </Space>
         <Table columns={columns} dataSource={tableData} locale={{emptyText: '暂无数据'}} />
       </Card>
 

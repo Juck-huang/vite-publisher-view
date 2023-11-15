@@ -1,4 +1,4 @@
-import { Card, Table, Space, Switch, Button, message, Modal, Select } from 'antd'
+import { Card, Table, Space, Switch, Button, Modal, Select } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useEffect, useState } from 'react'
 import AddOrEditModal from './addOrEditModal'

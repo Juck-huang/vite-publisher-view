@@ -94,22 +94,31 @@ const Database = () => {
             } else {
                 aMsg.success("执行sql成功")
             }
+            // 空标题列表索引
+            let null_title_index_list:any = []
             if (res.result?.title?.length) {
-                const columnList = res.result.title.map((item:any)=>({
-                    title: item,
-                    dataIndex: item,
-                    key: item,
-                    ellipsis: {
-                        showTitle: false
-                    },
-                    width: 150,
-                    align: 'center',
-                    render: (text:string) => (
-                        <Tooltip placement="topLeft" title={text}>
-                            {text}
-                        </Tooltip>
-                    )
-                }))
+                let columnList = res.result.title.map((item:any, index: number)=>{
+                    if (item === "NULL") {
+                        null_title_index_list.push(index)
+                        return {}
+                    } 
+                    return {
+                        title: item,
+                        dataIndex: item,
+                        key: item,
+                        ellipsis: {
+                            showTitle: false
+                        },
+                        width: 150,
+                        align: 'center',
+                        render: (text:string) => (
+                            <Tooltip placement="topLeft" title={text}>
+                                {text}
+                            </Tooltip>
+                        )
+                    }
+                })
+                columnList = columnList.filter((item:any) => item.title)
                 setTableColumns(columnList)
             }
             if (res.result?.content?.length) {
@@ -118,12 +127,10 @@ const Database = () => {
                         key: index,
                     }
                     res.result?.title.forEach((title:any, index:any)=>{
-                        obj[title] = item[index]
+                        obj[title] = item[index].replace(/NULL/g, '').trim() // `替换为空
                     })
                     return obj
                 })
-                // res.result?.title.map((key,index)=>({[key]: item[index]}))
-                // console.log('dataList', dataList)
                 setCurrentPage(1)
                 setTableDatas(dataList)
             }

@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { langs } from '@uiw/codemirror-extensions-langs'
 import { vscodeDark } from '@uiw/codemirror-theme-vscode'
 
-const MyCodeMirror = ({ codeValue, codeType, setCodeValue, height }) => {
+const MyCodeMirror = ({ codeValue, codeType, setCodeValue, height }:any) => {
 
-  const [extension, setExtension] = useState([])
+  const [extension, setExtension] = useState<any>([])
 
-  const onChange = useCallback((value, viewUpdate) => {
+  const onChange = useCallback((value:any) => {
     // console.log('value', value)
     setCodeValue(value)
   }, [setCodeValue])
