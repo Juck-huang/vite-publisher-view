@@ -228,20 +228,16 @@ const FileList = forwardRef((props:any, ref) => {
   
     // 下载文件
     const downloadFile = async (key:any) => {
+      
       handleLoading(true)
       // console.log('key', key, breadRef.current.at(-1))
       const pathName = breadRef.current.length ? `${breadRef.current.at(-1).key}/${key}` : key
       const projectId = projectIdRef.current
       const projectEnvId = projectEnvIdRef.current
       const projectTypeId = projectTypeIdRef.current
-    //   const params = {
-    //       projectId: projectIdRef.current,
-    //       projectEnvId: projectEnvIdRef.current,
-    //       projectTypeId: projectTypeIdRef.current,
-    //       pathName
-    //   }
+      
       // 使用iframe下载，支持暂停
-      const url = `/api/rest/fileManager/getProjectFile?token=${getToken()}&projectId=${projectId}&projectEnvId=${projectEnvId}&projectTypeId=${projectTypeId}&pathName=${pathName}`
+      const url = `/aps-web/rest/fileManager/getProjectFile?token=${getToken()}&projectId=${projectId}&projectEnvId=${projectEnvId}&projectTypeId=${projectTypeId}&pathName=${pathName}`
       let iframe:any = document.createElement('iframe')
       iframe.src = url
       iframe.id= 'myIframe'
@@ -249,12 +245,13 @@ const FileList = forwardRef((props:any, ref) => {
       iframe.onload = () => {
           document.body.removeAttribute(iframe)
       }
+      console.log('downloadFile', projectId,projectEnvId,projectTypeId )
       document.body.appendChild(iframe)
       setTimeout(() => {
         const myIframe:any = document.getElementById('myIframe')
         const myIframeBody = myIframe.contentDocument.body
         const preDatas = myIframeBody.getElementsByTagName('pre')
-        
+        console.log('preDatas', preDatas)
         if (preDatas.length) {
             // 说明返回的是错误信息
             const innerHTML = preDatas[0]?.innerHTML
@@ -268,33 +265,6 @@ const FileList = forwardRef((props:any, ref) => {
         iframe.src = "about:blank"
         iframe.parentNode.removeChild(iframe)
       }, 200)
-
-    //   const res:any = await DownloadProjectFile(params)
-    //   if (res.type === 'application/json') {
-    //       // 说明下载失败
-    //       const file:any = new FileReader()
-    //       file.readAsText(res, 'utf-8')
-    //       file.onload = () => {
-    //           const { success, message } = JSON.parse(file.result)
-    //           if (!success) {
-    //               msg.error(message)
-    //               return
-    //           }
-    //       }
-    //   } else if (res.type === 'application/octet-stream') {
-    //       const blob = new Blob([res])
-    //       const blobUrl = URL.createObjectURL(blob)
-    //       const a = document.createElement('a')
-    //       a.style.display = 'none'
-    //       document.body.appendChild(a)
-    //       a.download = key
-    //       a.href = blobUrl
-    //       a.click()
-    //       document.body.removeChild(a)
-    //   } else {
-    //       msg.error('所选文件或文件夹暂不支持下载')
-    //       return
-    //   }
       handleLoading(false)
     }
   

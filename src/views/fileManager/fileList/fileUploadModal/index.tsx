@@ -17,7 +17,7 @@ const FileUploadModal = (props:any) => {
   // 创建一个去计算md5的worker进程
   const createFileMd5InWorker = (fileChunks: any) =>{
     return new Promise((resolve)=>{
-        const worker = new Worker(new URL('./hash.worker.ts', import.meta.url),{type: 'module'})
+        const worker = new Worker(new URL('hash.worker.ts', import.meta.url),{type: 'module'})
         worker.postMessage({fileChunks})
         worker.onmessage = (e) => {
             // 进度条

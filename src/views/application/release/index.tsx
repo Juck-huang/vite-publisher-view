@@ -6,6 +6,7 @@ import {
     message,
     TreeSelect,
     UploadFile,
+    notification,
 } from 'antd'
 import { useEffect, useState } from 'react'
 import { releaseProject } from '../../../api/publish'
@@ -129,8 +130,19 @@ const Release = () => {
         releaseProject(formData).then((res: any)=>{
             if (res.success) {
                 message.success('发布成功')
+                console.log(uploadFileList[0]?.originFileObj)
+                notification.success({
+                    message: `发布成功`,
+                    description: `发布${uploadFileList[0]?.originFileObj.name}成功`,
+                    duration: 10,
+                })
             } else {
                 message.error('发布失败:'+res.message)
+                notification.error({
+                    message: '发布失败',
+                    description: '发布失败',
+                    duration: 30,
+                })
             }
             form.setFieldValue('projectId', undefined)// 重置项目id
             form.setFieldValue('projectEnvId', undefined) // 重置项目环境id
@@ -139,6 +151,11 @@ const Release = () => {
         }).catch(err=>{
             console.error('服务器异常', err)
             message.error('服务器异常:'+err)
+            notification.error({
+                message: '发布失败',
+                description: '发布失败',
+                duration: 30,
+            })
         }).finally(()=>{
             setUploading(false)
         })
