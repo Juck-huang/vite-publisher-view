@@ -22,7 +22,7 @@ const AddFile = (props:any) => {
             projectId: projectIdRef.current,
             projectEnvId: projectEnvIdRef.current,
             projectTypeId: projectTypeIdRef.current,
-            pathName: breadcrumbList.at(-1)?.key || '',
+            pathName: breadcrumbList.slice(-1)[0]?.key || '',
             addFileName: res.name
         }
         const result:any = await AddProjectFile(params)

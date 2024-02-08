@@ -182,7 +182,7 @@ const FileList = forwardRef((props:any, ref) => {
   
     const openFileModal = () => {
       // 设置上传文件路径,取面包屑最后一个对象的key即可
-      setUploadPath(breadcrumbList.length ? breadcrumbList.at(-1)?.key: '/')
+      setUploadPath(breadcrumbList.length ? breadcrumbList.slice(-1)[0]?.key: '/')
       handleOpenFileModal(true)
     }
   
@@ -231,13 +231,14 @@ const FileList = forwardRef((props:any, ref) => {
       
       handleLoading(true)
       // console.log('key', key, breadRef.current.at(-1))
-      const pathName = breadRef.current.length ? `${breadRef.current.at(-1).key}/${key}` : key
+      const pathName = breadRef.current.length ? `${breadRef.current.slice(-1)[0].key}/${key}` : key
       const projectId = projectIdRef.current
       const projectEnvId = projectEnvIdRef.current
       const projectTypeId = projectTypeIdRef.current
       
       // 使用iframe下载，支持暂停
-      const url = `/aps-web/rest/fileManager/getProjectFile?token=${getToken()}&projectId=${projectId}&projectEnvId=${projectEnvId}&projectTypeId=${projectTypeId}&pathName=${pathName}`
+      let downloadPrefix = import.meta.env.MODE === 'production'?'/aps-web':'/api'
+      const url = `${downloadPrefix}/rest/fileManager/getProjectFile?token=${getToken()}&projectId=${projectId}&projectEnvId=${projectEnvId}&projectTypeId=${projectTypeId}&pathName=${pathName}`
       let iframe:any = document.createElement('iframe')
       iframe.src = url
       iframe.id= 'myIframe'
@@ -245,13 +246,13 @@ const FileList = forwardRef((props:any, ref) => {
       iframe.onload = () => {
           document.body.removeAttribute(iframe)
       }
-      console.log('downloadFile', projectId,projectEnvId,projectTypeId )
+    //   console.log('downloadFile', projectId,projectEnvId,projectTypeId )
       document.body.appendChild(iframe)
       setTimeout(() => {
         const myIframe:any = document.getElementById('myIframe')
-        const myIframeBody = myIframe.contentDocument.body
+        const myIframeBody = myIframe?.contentDocument.body
         const preDatas = myIframeBody.getElementsByTagName('pre')
-        console.log('preDatas', preDatas)
+        // console.log('preDatas', preDatas)
         if (preDatas.length) {
             // 说明返回的是错误信息
             const innerHTML = preDatas[0]?.innerHTML
@@ -264,7 +265,7 @@ const FileList = forwardRef((props:any, ref) => {
         // n毫秒后销毁iframe
         iframe.src = "about:blank"
         iframe.parentNode.removeChild(iframe)
-      }, 200)
+      }, 500)
       handleLoading(false)
     }
   
@@ -297,12 +298,12 @@ const FileList = forwardRef((props:any, ref) => {
             projectId: projectIdRef.current,
             projectEnvId: projectEnvIdRef.current,
             projectTypeId: projectTypeIdRef.current,
-            pathName: breadRef.current.at(-1) ? `${breadRef.current.at(-1).key}/${val.key}` : `${val.key}`
+            pathName: breadRef.current.slice(-1)[0] ? `${breadRef.current.slice(-1)[0].key}/${val.key}` : `${val.key}`
         }
         const res:any = await RemoveProjectFile(params)
         if (res.success) {
             message.success(res.message)
-            params.pathName =  `${breadRef.current.at(-1)?.key || ''}`
+            params.pathName =  `${breadRef.current.slice(-1)[0]?.key || ''}`
             getFileList(params)
         } else {
             message.error(res.message)
@@ -327,7 +328,7 @@ const FileList = forwardRef((props:any, ref) => {
 
     // 提交勾选删除
     const submitDeleteChecked = () =>{
-        console.log('tableSelectedRowKeys', tableSelectedRowKeys)
+        // console.log('tableSelectedRowKeys', tableSelectedRowKeys)
         setOpenDelteModal(false)
     }
 
@@ -339,7 +340,7 @@ const FileList = forwardRef((props:any, ref) => {
   
     useEffect(()=>{
         breadRef.current = breadcrumbList
-        console.log('tableSelectedRowKeys', tableSelectedRowKeys)
+        // console.log('tableSelectedRowKeys', tableSelectedRowKeys)
         setTableSelectedRowKeys([]) // 清空已经选择的keys
     },[breadcrumbList])
 
@@ -416,7 +417,7 @@ const FileList = forwardRef((props:any, ref) => {
           isModalEditOpen ? (
             <FileEditModal
                 isModalEditOpen={isModalEditOpen}
-                filePath={breadcrumbList.length ? breadcrumbList.at(-1)?.key: '/'}
+                filePath={breadcrumbList.length ? breadcrumbList.slice(-1)[0]?.key: '/'}
             />
           ) : <></>
         }

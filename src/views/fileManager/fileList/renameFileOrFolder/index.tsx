@@ -28,14 +28,14 @@ const RenameFileOrFolder = (props:any) => {
             projectId: projectIdRef.current,
             projectEnvId: projectEnvIdRef.current,
             projectTypeId: projectTypeIdRef.current,
-            pathName: `${breadcrumbList.at(-1)?.key || ''}/${currClickFileName}`, // 原文件/文件夹相对路径
+            pathName: `${breadcrumbList.slice(-1)[0]?.key || ''}/${currClickFileName}`, // 原文件/文件夹相对路径
             newFileName: `${form.getFieldValue('newName')}`  // 新文件/文件夹相对路径
         }
         const result:any = await ReNameFile(params)
         if (result.success) {
             message.success(result.message)
             delete params.newFileName
-            params.pathName = breadcrumbList.at(-1)?.key || ''
+            params.pathName = breadcrumbList.slice(-1)[0]?.key || ''
             handleRenameFileModalOpen(false)
             await getFileList(params)
         } else {
@@ -78,7 +78,7 @@ const RenameFileOrFolder = (props:any) => {
                     name="filePath"
                 >
                    {
-                       `${breadcrumbList.at(-1)?.key || '/'}`
+                       `${breadcrumbList.slice(-1)[0]?.key || '/'}`
                    }
                 </Form.Item>
                 <Form.Item

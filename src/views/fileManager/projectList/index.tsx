@@ -14,8 +14,8 @@ const ProjectList = (props:any) => {
 
     // 处理选择了树后的回调
     const handSelectTree = (selectedKeys:any[]) => {
-      // console.log('selectedKeys', selectedKeys)
-      const idList = selectedKeys.length ? selectedKeys.at(-1).split('-'): []
+      // console.log('selectedKeys', selectedKeys.at(-1))
+      const idList = selectedKeys.length ? selectedKeys.slice(-1)[0]?.split('-'): []
       if (!idList.length) return
       const params = {
           projectId: Number(idList[0]),

@@ -6,10 +6,9 @@ import "nprogress/nprogress.css"
 import { setOperationTime } from './timeOut'
 
 const service = axios.create({
-    baseURL: process.env.NODE_ENV === 'production'?'/aps-web':'/api',
+    baseURL: import.meta.env.MODE === 'production'?'/aps-web':'/api',
     timeout: 1000 * 60 * 5 , // 单位毫秒
 })
-
 NProgress.configure({ showSpinner: false }); // 显示右上角螺旋加载提示
 
 // 添加请求拦截器

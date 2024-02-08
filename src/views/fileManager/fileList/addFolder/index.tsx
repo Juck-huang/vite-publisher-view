@@ -21,7 +21,7 @@ import { FileContext } from '../../fileContext'
             projectId: projectIdRef.current,
             projectEnvId: projectEnvIdRef.current,
             projectTypeId: projectTypeIdRef.current,
-            pathName: breadcrumbList.at(-1)?.key || '',
+            pathName: breadcrumbList.slice(-1)[0]?.key || '',
             addFolderName: res.name
         }
         const result:any = await AddProjectFolder(params)

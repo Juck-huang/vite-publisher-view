@@ -8,12 +8,14 @@ import {
     UploadFile,
     notification,
 } from 'antd'
+import { InboxOutlined }  from '@ant-design/icons';
 import { useEffect, useState } from 'react'
 import { releaseProject } from '../../../api/publish'
 import { GetProjectList } from '../../../api/project/project'
 import './index.scss'
 import { GetProjectEnvList } from '../../../api/project/projectEnv'
 import { GetProjectTypeList } from '../../../api/project/projectType'
+const { Dragger } = Upload
 
 // 发布组件
 const Release = () => {
@@ -126,6 +128,7 @@ const Release = () => {
         formData.append('projectId',data.projectId)
         formData.append('envId', data.envId)
         formData.append('typeId', data.typeId)
+
         setUploading(true)
         releaseProject(formData).then((res: any)=>{
             if (res.success) {
@@ -304,14 +307,30 @@ const Release = () => {
                                 label="项目文件"
                                 valuePropName="fileList"
                                 >
-                                <Upload
+                                {/* <Upload
                                     fileList={fileList}
                                     beforeUpload={beforeUpload} 
                                     onRemove={onRemove}
                                     onChange={onChange}
                                     maxCount={1}>
                                     <Button>点击上传</Button>
-                                </Upload>
+                                </Upload> */}
+                                <Dragger
+                                    name='file'
+                                    fileList={fileList}
+                                    beforeUpload = {beforeUpload}
+                                    onChange= {onChange}
+                                    onRemove={onRemove}
+                                    maxCount={1}
+                                >
+                                    <p className="ant-upload-drag-icon">
+                                        <InboxOutlined />
+                                    </p>
+                                    <p className="ant-upload-text">拖拽或者点击上传项目文件</p>
+                                    <p className="ant-upload-hint">
+                                        仅支持单项目文件上传
+                                    </p>
+                                </Dragger>
                             </Form.Item>
                             <Form.Item label="发布">
                                 <Button
