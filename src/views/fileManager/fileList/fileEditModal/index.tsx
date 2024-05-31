@@ -1,4 +1,4 @@
-import { Modal, Space, message } from 'antd'
+import { Modal, message } from 'antd'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import MyCodeMiddor from '@/components/myCodeMirror'
 import { FileContext } from '../../fileContext'
@@ -38,12 +38,12 @@ const FileEditModal = (props:any) => {
   }
 
   const handleCancel = () => {
-    console.log('handleCancel')
+    // console.log('handleCancel')
     handleFileEdit(false)
   }
 
   const getFileText = useCallback(async () => {
-    console.log('获取文件文本', filePath, currEditFile)
+    // console.log('获取文件文本', filePath, currEditFile)
     const params = {
         projectId: projectIdRef.current,
         projectEnvId: projectEnvIdRef.current,
@@ -67,19 +67,16 @@ const FileEditModal = (props:any) => {
           open={isModalEditOpen} 
           onOk={handleOk} 
           onCancel={handleCancel}
-          width={900}
+          width={1400}
           cancelText='取消'
           okText='提交'
           maskClosable={false}
         >
-          <Space size={5}>
-            代码格式
-          </Space>
           <MyCodeMiddor 
             codeValue={codeValue}
             setCodeValue={setCodeValue}
             codeType={currEditFile.extName}
-            height='500px'
+            height='600px'
           />
         </Modal>
     </>

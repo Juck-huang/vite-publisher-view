@@ -1,69 +1,26 @@
-import { Button, Card, Modal, Space, Switch, Table, Tag } from 'antd'
-import { useState } from 'react'
+import { getAppList, startOrStopApp } from '@/api/application'
+import { Button, Card, message, Popconfirm, Space, Switch, Table, Tag } from 'antd'
+import { ColumnsType } from 'antd/es/table'
+import { useEffect, useState } from 'react'
+
+interface DataType {
+  key: string,
+  name: string, // 名称
+  runStatus: number, // 运行状态，运行/停止
+  packageTime: string, // 包发布时间
+  runTime: string, // 运行时长
+  startTime: string, // 启动时间
+  devLanauge: string, //开发语言
+}
 
 // 应用管理组件
 const Manage = () => {
 
-  const [columns, 
-    // setColumns
-  ] = useState([
-    {
-      title: '项目名称',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: '项目环境',
-      dataIndex: 'env',
-      key: 'env',
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (_: any) => (
-        <Space size="middle">
-          <span style={{cursor: 'pointer', color: 'blue'}} onClick={()=>{handleManageProject()}}>应用管理</span>
-        </Space>
-      )
-    }
-  ]) // 项目列
+  // 表格数据
+  const [dataSource, setDataSource] = useState<Array<DataType>>([]) 
 
-  const [data, 
-    // setData
-  ] = useState([{
-    key: '1',
-    name: '城盾隧安信息化管控平台',
-    id: 1,
-    env: '拟真环境'
-  },
-  {
-    key: '2',
-    name: '城盾隧安信息化管控平台',
-    id: 2,
-    env: '试运行环境'
-  }]) // 项目数据
-
-  const [manageModalOpen, setManageModalOpen] = useState(false) // 应用管理模态框打开
-
-  const handleRunChecked = (checked:boolean, record:any) => {
-    setTableData(table => {
-      const newTableData = JSON.parse(JSON.stringify(table))
-      newTableData.forEach((item:any) => {
-        if (item.key === record.key) {
-          checked ? item.status = 1:item.status = 0
-        }
-      })
-      return newTableData
-    })
-  }// 运行或停止项目处理
-
-  const handleDaemonChecked = (checked: boolean, record:any) => {
-    console.log(checked, record)
-  } // 守护进程点击处理
-
-  const [tableColumns, 
-    // setTableColumns
-  ] = useState([
+  // 表格列
+  const tableColumns: ColumnsType<DataType> = [
     {
       title: '应用名称',
       dataIndex: 'name',
@@ -71,74 +28,136 @@ const Manage = () => {
     },
     {
       title: '运行状态',
-      dataIndex: 'status',
-      key: 'status',
+      dataIndex: 'runStatus',
+      key: 'runStatus',
       render: (text:string) => text ? <Tag color="green">正常</Tag> : <Tag color="red">停止</Tag>
     },
     {
+      title: '包发布时间',
+      dataIndex: 'packageTime',
+      key: 'packageTime',
+    },
+    {
+      title: '启动时间',
+      dataIndex: 'startTime',
+      key: 'startTime',
+      align: 'center',
+    },
+    {
+      title: '运行时长',
+      dataIndex: 'runTime',
+      key: 'runTime',
+      align: 'center',
+    },
+    {
+      title: '开发语言',
+      dataIndex: 'devLanauge',
+      key: 'devLanauge',
+      align: 'center',
+    },
+    {
       title: '运行/停止',
-      dataIndex: 'status',
       key: 'status',
-      render: (_:any, record:any) => <Switch checked={record.status?true:false} onClick={(checked)=>{handleRunChecked(checked, record)}} />
+      dataIndex: 'status',
+      align: 'center',
+      render: (_:any, record:any) => <>
+        <Popconfirm
+          title={`确认${record.runStatus===true?"关闭":"开启"}应用？`}
+          onConfirm={()=>{runOrStopApp(!record.runStatus, record)}}
+          okText="确认"
+          cancelText="取消"
+        >
+          <Switch checked={record.runStatus} />
+        </Popconfirm>
+      </>
     },
     {
-      title: '开启守护进程',
-      dataIndex: 'isDaemon',
-      key: 'isDaemon',
-      render: (_:any, record:any) => <Switch checked={record.isDaemon} onClick={(checked)=>{handleDaemonChecked(checked, record)}} />
+      title: '操作',
+      key: '',
+      dataIndex: '',
+      align: 'center',
+      render: (_:any, record:any) => (<>
+        <Popconfirm
+          title="确认重启应用?"
+          onConfirm={()=>{restartApp(record)}}
+          okText="确认"
+          cancelText="取消"
+        >
+          <Button type="primary" size='small'>重启</Button>
+        </Popconfirm>
+        &nbsp;
+        <Button type="primary" size='small'>日志预览</Button>&nbsp;
+        <Button type="primary" size='small'>编辑配置</Button>
+      </>)
     },
-    {
-      title: '实时日志',
-      dataIndex: 'realTimeLog',
-      key: 'realTimeLog',
-      render: (_:any) => <Button type="primary" size='small'>预览</Button>
-    },
-  ]) // 管理对话框表格列
-  const [tableData, setTableData] = useState([
-    {
-      key: '1',
-      name: 'stec-emerge-service',
-      status: 0,
-      isDaemon: true
-    },
-    {
-      key: '2',
-      name: 'stec-emerge-web',
-      status: 1,
-      isDaemon: false
-    },
-  ]) // 管理对话框表格数据
+  ]
 
-  const handleManageProject = () => {
-    setManageModalOpen(true)
-  } // 处理进入项目管理
+
+  // 获取应用数据列表
+  const getAppData = async () => {
+    const res:any = await getAppList({})
+    if (res.success) {
+      res.result.forEach((item:any) => {
+        item.key = item.id
+      })
+      setDataSource(res.result)
+    }
+  }
+
+  // 运行或停止应用
+  const runOrStopApp = async (checked:boolean, record: any) => {
+    // 如果当前应用已经是正在运行，则无法再次运行
+    if(record.runStatus === checked) return message.error('当前应用已经开启，无需再次开启')
+
+    let direct: string = 'start'
+    if(!checked) {
+      direct = 'stop'
+    }
+    const res:any = await startOrStopApp({
+      id: `${record.id}`,
+      direct,
+    })
+    if(res.success) {
+      await getAppData()
+      message.success(res.message)
+    } else {
+      return message.error(res.message)
+    }
+  }
+
+  // 重启应用
+  const restartApp = async (record: any) => {
+    // 如果应用已经是关闭，则不让重启
+    if(!record.runStatus) return message.error('当前应用已经关闭，请先开启')
+    // 调用重启接口
+    const res:any = await startOrStopApp({
+      id: `${record.id}`,
+      direct: 'restart',
+    })
+    if(!res.success) {
+      return message.error(res.message)
+    }
+    await getAppData()
+    message.success(res.message)
+  }
+
+  useEffect(()=>{
+    getAppData()
+  },[])
 
   return (
     <>
         <Card
             title="应用管理"
-            extra={<></>}
+            extra={<>
+              <Space>
+                <Button type='primary' onClick={getAppData}>刷新</Button>
+              </Space>
+            </>}
             bordered={false}
         >
-            <Table 
-              dataSource={data}
-              columns={columns}
-              pagination={{
-                hideOnSinglePage: true
-              }}
-            />
+            <Table dataSource={dataSource} columns={tableColumns} />
         </Card>
-
-        <Modal
-          title={`管理`}
-          open={manageModalOpen} 
-          onCancel={()=>{setManageModalOpen(false)}}
-          footer={null}
-          width={1000}
-          maskClosable={false}
-          >
-            <Table columns={tableColumns} dataSource={tableData} />
-        </Modal>
     </>
   )
 }

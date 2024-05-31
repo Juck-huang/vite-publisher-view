@@ -250,7 +250,7 @@ const Database = () => {
                                 codeValue={areaText}
                                 setCodeValue={setAreaText}
                                 codeType='sql'
-                                height='260px'
+                                height='300px'
                             />
                             {/* <TextArea
                                 placeholder='请输入sql语句，点击执行获取执行结果'

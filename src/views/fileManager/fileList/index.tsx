@@ -20,6 +20,7 @@ import AddFile from './addFile'
 import RenameFileOrFolder from './renameFileOrFolder'
 import { ColumnsType } from 'antd/es/table'
 import { getToken } from '@/utils/auth'
+import MoveFileOrFolder from './moveFileOrFolder'
 
 const FileList = forwardRef((props:any, ref) => {
     
@@ -28,6 +29,7 @@ const FileList = forwardRef((props:any, ref) => {
     } = props
     const [isModalFileOpen, setIsModalFileOpen] = useState(false) // 是否打开上传文件模态框
     const [isModalAddFolder, setIsModalAddFolder] = useState(false) // 新增文件夹模态框
+    const [isModalMoveFileOrFolder, setModalMoveFileOrFolder] = useState(false) // 移动文件或文件夹模态框
     const [isModalAddFile, setIsModalAddFile] = useState(false) // 新增文件模态框
     const [isModalRenameFile, setIsModalRenameFile] = useState(false) // 重命名文件/文件夹模态框
     const [showButton, setShowButton] = useState(false) // 显示顶部按钮
@@ -153,8 +155,8 @@ const FileList = forwardRef((props:any, ref) => {
               }
               return (
                 <Space size="small">
-                    <span style={{cursor: 'pointer', color: 'blue', fontSize: 12}}>移动</span>
-                    <span style={{cursor: 'pointer', color: 'blue', fontSize: 12}}>复制</span>
+                    <span style={{cursor: 'pointer', color: 'blue', fontSize: 12}} onClick={() => handleMove(record)}>移动</span>
+                    <span style={{cursor: 'pointer', color: 'blue', fontSize: 12}} onClick={() => handleCopy(record)}>复制</span>
                     {
                         items.length ? (
                             <Dropdown menu={{items}}>
@@ -170,6 +172,17 @@ const FileList = forwardRef((props:any, ref) => {
             }
         },
     ])
+
+    // 处理移动文件或文件夹
+    const handleMove = (record: any) => {
+        setModalMoveFileOrFolder(true)
+        setCurrClickFileName(record.name)
+    }
+
+    // 处理复制文件或文件夹
+    const handleCopy = (record: any) => {
+        console.log('copy:', record)
+    }
 
     const clearBread = useCallback(() => {
         setBreadcrumbList([])
@@ -228,9 +241,7 @@ const FileList = forwardRef((props:any, ref) => {
   
     // 下载文件
     const downloadFile = async (key:any) => {
-      
       handleLoading(true)
-      // console.log('key', key, breadRef.current.at(-1))
       const pathName = breadRef.current.length ? `${breadRef.current.slice(-1)[0].key}/${key}` : key
       const projectId = projectIdRef.current
       const projectEnvId = projectEnvIdRef.current
@@ -246,26 +257,24 @@ const FileList = forwardRef((props:any, ref) => {
       iframe.onload = () => {
           document.body.removeAttribute(iframe)
       }
-    //   console.log('downloadFile', projectId,projectEnvId,projectTypeId )
       document.body.appendChild(iframe)
       setTimeout(() => {
         const myIframe:any = document.getElementById('myIframe')
         const myIframeBody = myIframe?.contentDocument.body
         const preDatas = myIframeBody.getElementsByTagName('pre')
-        // console.log('preDatas', preDatas)
         if (preDatas.length) {
             // 说明返回的是错误信息
             const innerHTML = preDatas[0]?.innerHTML
             if (innerHTML) {
                 const res = JSON.parse(innerHTML)
-                if (!res.success) return msg.error('下载文件失败:'+res.msg)
+                if (!res.success) msg.error('下载文件失败:'+res.msg)
             }
         }
-        
-        // n毫秒后销毁iframe
+        //n毫秒后销毁iframe
         iframe.src = "about:blank"
         iframe.parentNode.removeChild(iframe)
       }, 500)
+
       handleLoading(false)
     }
   
@@ -402,30 +411,30 @@ const FileList = forwardRef((props:any, ref) => {
         </div>
   
         {
-          // 上传文件对话框
-          isModalFileOpen ? (
+           // 上传文件对话框
+           isModalFileOpen ? (
               <FileUploadModal 
                   isModalFileOpen={isModalFileOpen} 
                   handleOpenFileModal={handleOpenFileModal}
                   uploadPath={uploadPath}
                   getFileList={getFileList}
               />
-            ) : <></>
+           ) : <></>
         }
         {
-          // 文件编辑对话框
-          isModalEditOpen ? (
+           // 文件编辑对话框
+           isModalEditOpen ? (
             <FileEditModal
                 isModalEditOpen={isModalEditOpen}
                 filePath={breadcrumbList.length ? breadcrumbList.slice(-1)[0]?.key: '/'}
             />
-          ) : <></>
+           ) : <></>
         }
         {
             // 新增文件夹对话框
            isModalAddFolder ? (
                <AddFolder 
-                isModalAddFolder={isModalAddFolder}
+                isModalAddFolder={isModalAddFolder} 
                 handleFolderModalOpen={handleFolderModalOpen}
                 breadcrumbList={breadcrumbList}
                 getFileList={getFileList}
@@ -444,8 +453,8 @@ const FileList = forwardRef((props:any, ref) => {
            ) : <></>
         }
         {
-            // 重命名文件/文件夹对话框
-            isModalRenameFile ? (
+           // 重命名文件/文件夹对话框
+           isModalRenameFile ? (
                <RenameFileOrFolder
                 isModalRenameFile={isModalRenameFile}
                 handleRenameFileModalOpen={(value:any)=>{setIsModalRenameFile(value)}}
@@ -456,7 +465,7 @@ const FileList = forwardRef((props:any, ref) => {
            ) : <></>
         }
         {
-            <Modal
+           <Modal
             title="提示"
             open={openDelteModal}
             onCancel={()=>setOpenDelteModal(false)}
@@ -466,7 +475,18 @@ const FileList = forwardRef((props:any, ref) => {
             cancelText="取消"
           >
             <h4>确认删除选中文件/文件夹? <span style={{color: 'red'}}>(注意，删除操作不可逆!!!)</span></h4>
-          </Modal>
+           </Modal>
+        }
+        {
+           isModalMoveFileOrFolder ? (
+                <MoveFileOrFolder
+                    isModalMoveFileOrFolder={isModalMoveFileOrFolder} 
+                    handleModalMoveFileOrFolderOpen={setModalMoveFileOrFolder}
+                    breadcrumbList={breadcrumbList}
+                    getFileList={getFileList}
+                    currClickFileName={currClickFileName}
+                />
+           ): <></>
         }
       </>
     )

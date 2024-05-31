@@ -6,7 +6,8 @@ import {
   Switch,
   message,
 } from 'antd'
-import { exportOrBakUpDatabase, singleExportTables } from '@/api/database'
+import { exportOrBakUpDatabase, getExportDetail, singleExportTables } from '@/api/database'
+import { getToken } from '@/utils/auth'
 
 // 导出或备份数据库组件
 const ExportOrBakUpDb = (props:any) => {
@@ -40,7 +41,7 @@ const ExportOrBakUpDb = (props:any) => {
     }
   }
   // 点击导出按钮的回调
-  const handleModalOk = () => {
+  const handleModalOk = async () => {
     // 如果未选择数据库则先不让导出
     if (!selectDb) {
       message.error('请先选择数据库')
@@ -57,56 +58,123 @@ const ExportOrBakUpDb = (props:any) => {
       return
     }
     handleExportOrBakUpDbClick(false) // 关闭对话框
-    handleLoading(true) // 打开加载框
     // 导出指定表
     if (selectAssignTable) {
-      singleExportTables({
+      handleLoading(true) // 打开加载框
+      const res:any = singleExportTables({
         dbName: selectDb,
         exportTables: selectTables,
-      }).then((res:any)=>{
-        if (res.type === 'application/zip') {
-          const blob = new Blob([res], {type: 'application/octet-stream'})
-          const link = document.createElement('a')
-          link.href = window.URL.createObjectURL(blob)
-          link.download = `${selectDb}.zip`
-          link.click()
-        } else if (res.type === 'application/json') {
-          message.error('导出数据失败')
-        } else {
-          if (res.success) {
-            message.success(res.message)
-          } else {
-            message.error(res.message)
-          }
-        }
-        handleLoading(false)
       })
+      if (res.type === 'application/zip') {
+        const blob = new Blob([res], {type: 'application/octet-stream'})
+        const link = document.createElement('a')
+        link.href = window.URL.createObjectURL(blob)
+        link.download = `${selectDb}.zip`
+        link.click()
+      } else if (res.type === 'application/json') {
+        message.error('导出数据失败')
+      } else {
+        if (res.success) {
+          message.success(res.message)
+        } else {
+          message.error(res.message)
+        }
+      }
+      handleLoading(false)
     } else {
       // 导出除了排除表外全部表
-      exportOrBakUpDatabase({
+      // exportOrBakUpDatabase({
+      //   dbName: selectDb,
+      //   ignoreTables: selectTables,
+      //   type: modalType // type为1代表备份，为2代表的是导出数据库
+      // }, modalType === 2 ?'blob': 'json').then((res:any)=>{
+      //   if (res.type === 'application/zip') {
+      //     const blob = new Blob([res], {type: 'application/octet-stream'})
+      //     const link = document.createElement('a')
+      //     link.href = window.URL.createObjectURL(blob)
+      //     link.download = `${selectDb}.zip`
+      //     link.click()
+      //   } else if (res.type === 'application/json') {
+      //     message.error('导出或备份数据失败')
+      //   } else {
+      //     if (res.success) {
+      //       message.success(res.message)
+      //     } else {
+      //       message.error(res.message)
+      //     }
+      //   }
+      //   handleLoading(false)
+      // })
+      handleLoading(true)
+      const res:any = await exportOrBakUpDatabase({
         dbName: selectDb,
         ignoreTables: selectTables,
         type: modalType // type为1代表备份，为2代表的是导出数据库
-      }, modalType === 2 ?'blob': 'json').then((res:any)=>{
-        if (res.type === 'application/zip') {
-          const blob = new Blob([res], {type: 'application/octet-stream'})
-          const link = document.createElement('a')
-          link.href = window.URL.createObjectURL(blob)
-          link.download = `${selectDb}.zip`
-          link.click()
-        } else if (res.type === 'application/json') {
-          message.error('导出或备份数据失败')
-        } else {
-          if (res.success) {
-            message.success(res.message)
-          } else {
-            message.error(res.message)
-          }
-        }
-        handleLoading(false)
       })
+      if(!res.success) {
+        return message.error(res.message, 3)
+      }
+      message.success(res.message, 5)
+      if(modalType === 2) {
+        const intervalId = setInterval(async ()=>{
+          const detail:any = await getExportDetail({
+            key: res.result,
+          })
+          console.log(detail)
+          if (!detail.success) {
+            clearInterval(intervalId)
+          }
+          if(detail.result?.completed) {
+            clearInterval(intervalId)
+            downloadExportFile(res.result)
+            console.log('已完成导出')
+            handleLoading(false)
+          }
+        }, 5000)
+  
+        setTimeout(()=>{
+          console.log('清除定时器');
+          clearInterval(intervalId)
+        },1000*60*5)
+      }else {
+        handleLoading(false)
+      }
     }
   }
+
+  // 下载导出文件
+  const downloadExportFile = (key:any) => {
+    // 使用iframe下载，支持暂停
+    let downloadPrefix = import.meta.env.MODE === 'production'?'/aps-web':'/api'
+    const url = `${downloadPrefix}/rest/database/total/downloadExportFile?token=${getToken()}&key=${key}`
+    let iframe:any = document.createElement('iframe')
+    iframe.src = url
+    iframe.id= 'myIframe'
+    iframe.style.display = 'none'
+    iframe.onload = () => {
+        document.body.removeAttribute(iframe)
+    }
+    document.body.appendChild(iframe)
+    setTimeout(() => {
+      const myIframe:any = document.getElementById('myIframe')
+      const myIframeBody = myIframe?.contentDocument.body
+      const preDatas = myIframeBody.getElementsByTagName('pre')
+      if (preDatas.length) {
+          // 说明返回的是错误信息
+          const innerHTML = preDatas[0]?.innerHTML
+          if (innerHTML) {
+              const res = JSON.parse(innerHTML)
+              if (!res.success) message.error('下载文件失败:'+res.msg)
+          }
+      }
+      //n毫秒后销毁iframe
+      iframe.src = "about:blank"
+      iframe.parentNode.removeChild(iframe)
+    }, 500)
+
+    handleLoading(false)
+  }
+
   // 处理点击了取消
   const handleModalCancel = () => {
     handleExportOrBakUpDbClick(false)

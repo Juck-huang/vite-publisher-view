@@ -115,3 +115,12 @@ export function RemoveProjectFile(data:any){
         data,
     })
 }
+
+// 移动或复制项目文件夹或文件
+export function MoveOrCopyFile(data:any){
+    return request({
+        method: 'post',
+        url: '/rest/fileManager/moveOrCopyFile',
+        data,
+    })
+}

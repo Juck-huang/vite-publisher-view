@@ -10,7 +10,7 @@ import {
 } from 'antd'
 import { InboxOutlined }  from '@ant-design/icons';
 import { useEffect, useState } from 'react'
-import { releaseProject } from '../../../api/publish'
+import { releaseProject } from '../../../api/application'
 import { GetProjectList } from '../../../api/project/project'
 import './index.scss'
 import { GetProjectEnvList } from '../../../api/project/projectEnv'

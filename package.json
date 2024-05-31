@@ -10,11 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons-svg": "^4.4.2",
     "@reduxjs/toolkit": "^1.9.5",
     "@uiw/codemirror-extensions-langs": "4.21.8",
     "@uiw/codemirror-theme-vscode": "4.21.8",
     "@uiw/react-codemirror": "4.21.8",
-    "antd": "4.24.8",
+    "antd": "4.24.16",
     "axios": "^1.5.0",
     "echarts": "^5.4.3",
     "jsencrypt": "^3.3.2",

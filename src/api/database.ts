@@ -1,12 +1,20 @@
 import request from '@/utils/request'
 
 // 导出或备份整个数据库
-export function exportOrBakUpDatabase(data:any, responseType:any){
+export function exportOrBakUpDatabase(data:any){
     return request({
         method: 'post',
         url: '/rest/database/total/export',
         data,
-        responseType
+    })
+}
+
+// 获取导出进度详情
+export function getExportDetail(data:any){
+    return request({
+        method: 'post',
+        url: '/rest/database/total/getExportDetail',
+        data,
     })
 }
 
